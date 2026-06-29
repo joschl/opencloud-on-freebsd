@@ -1,0 +1,85 @@
+redactions = [
+  "*SECRET*",
+  "*TOKEN*",
+  "*PASSWORD*",
+  "HCP_CLIENT_ID",
+  "HCP_CLIENT_SECRET",
+  "VAGRANT_CLOUD_TOKEN",
+]
+
+[tools]
+"aqua:hashicorp/hcp" = "latest"
+codex = "latest"
+
+[env]
+_.file = { path = ".env", redact = true }
+OPENCLOUD_VERSION = { default = "latest" }
+OPENCLOUD_EDITION = { default = "rolling" }
+OPENCLOUD_UPSTREAM_REPO = { default = "opencloud-eu/opencloud" }
+PATCH_SOURCE_REPO = { default = "daemonless/opencloud" }
+PATCH_SOURCE_REF = { default = "main" }
+FREEBSD_BOX = { default = "j0sch7/freebsd-15.1-builder" }
+FREEBSD_BOX_VERSION = { default = ">= 15.1.2" }
+FREEBSD_READY_BOX_VERSION = { default = "15.1.2" }
+FREEBSD_BUILD_DISK_MB = { default = "262144" }
+VAGRANT_CLOUD_BOX = { default = "j0sch7/freebsd-15.1-builder" }
+
+[tasks."box:up"]
+description = "Start and provision the FreeBSD build VM"
+run = "vagrant up"
+
+[tasks."box:build"]
+description = "Build and install a local FreeBSD 15.1 Vagrant box from the downloaded VMDK"
+run = "FREEBSD_BOX_FORCE=1 scripts/box-build-from-vmdk.sh"
+
+[tasks."box:ready"]
+description = "Package the configured FreeBSD builder VM as a reusable local Vagrant box"
+run = "scripts/box-package-ready.sh"
+
+[tasks."box:publish"]
+description = "Publish the reusable FreeBSD builder box to Vagrant Cloud"
+run = "scripts/box-publish.sh"
+
+[tasks."box:login"]
+description = "Log in to Vagrant Cloud with an HCP access token"
+run = "scripts/box-login.sh"
+
+[tasks."box:bootstrap-console"]
+description = "Print one-time root-console commands to make the stock FreeBSD image Vagrant-ready"
+run = "scripts/box-bootstrap-console.sh"
+
+[tasks."box:diagnose"]
+description = "Show Vagrant VM state, SSH config, and local forwarded SSH port listeners"
+run = "scripts/box-diagnose.sh"
+
+[tasks."opencloud:build"]
+description = "Build OpenCloud inside the FreeBSD Vagrant VM"
+run = "scripts/opencloud-build.sh"
+
+[tasks."box:build-fresh"]
+description = "Destroy local VM and build from a freshly booted remote FreeBSD builder box"
+run = "scripts/box-build-fresh.sh"
+
+[tasks."box:ssh"]
+description = "Open a shell in the FreeBSD build VM"
+run = "vagrant ssh"
+
+[tasks."build:clean"]
+description = "Remove host-side FreeBSD build artifacts"
+run = "rm -rf dist/freebsd"
+
+[tasks."box:clean"]
+description = "Remove stale VM-side build caches from the small root disk"
+run = "scripts/box-clean-vm.sh"
+
+[tasks."box:setup-disk"]
+description = "Format/mount the FreeBSD VM build disk at /opencloud-build"
+run = "vagrant upload scripts /tmp/opencloud-build-env/scripts && vagrant ssh -c \"sudo /bin/sh /tmp/opencloud-build-env/scripts/box-setup-disk.sh\""
+
+[tasks."box:destroy"]
+description = "Destroy the FreeBSD build VM"
+run = "vagrant destroy -f"
+
+[tasks."patches:update"]
+description = "Refresh local OpenCloud FreeBSD patches from the configured source repository"
+run = "scripts/patches-update.sh"

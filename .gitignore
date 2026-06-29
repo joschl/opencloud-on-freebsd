@@ -1,0 +1,11 @@
+.vagrant/
+build/
+dist/
+latest.json
+tarball_url
+version
+opencloud/
+*.box
+*.vmdk
+*.vmdk.xz
+.env

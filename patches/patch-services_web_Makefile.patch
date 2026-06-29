@@ -1,0 +1,13 @@
+--- services/web/Makefile       2026-05-20 13:19:20.091186000 +0000
++++ services/web/Makefile.new   2026-05-20 13:21:38.524136000 +0000
+@@ -40,7 +40,9 @@
+
+ .PHONY: download-assets
+ download-assets:
+-	git clean -xfd assets
++	if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then \
++		git clean -xfd assets; \
++	fi
+ 	curl --fail -slL -o- https://github.com/opencloud-eu/web/releases/download/$(WEB_ASSETS_VERSION)/web.tar.gz | tar xzf - -C assets/core/
+
+ .PHONY: ci-node-save-licenses

@@ -1,0 +1,19 @@
+--- .make/protobuf.mk.orig      2026-05-21 11:09:02.000000000 +0000
++++ .make/protobuf.mk   2026-05-21 20:04:18.914107000 +0000
+@@ -7,6 +7,7 @@
+ .PHONY: protoc-deps
+ protoc-deps: $(BINGO)
+ 	@cd ../.. && GOPATH="" GOBIN=".bingo" $(BINGO) get -l google.golang.org/protobuf/cmd/protoc-gen-go
++	@cd ../.. && GOPATH="" GOBIN=".bingo" $(BINGO) get -l google.golang.org/grpc/cmd/protoc-gen-go-grpc
+ 	@cd ../.. && GOPATH="" GOBIN=".bingo" $(BINGO) get -l github.com/go-micro/generator/cmd/protoc-gen-micro
+ 	@cd ../.. && GOPATH="" GOBIN=".bingo" $(BINGO) get -l github.com/owncloud/protoc-gen-microweb
+ 	@cd ../.. && GOPATH="" GOBIN=".bingo" $(BINGO) get -l github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2
+@@ -16,7 +16,7 @@
+ .PHONY: buf-generate
+ buf-generate: $(SHA1_LOCK_FILE)
+ 	@find $(abspath $(CURDIR)/../../protogen/proto/) -type f -print0 | sort -z | xargs -0 sha1sum > buf.sha1.lock.tmp
+-	@cmp $(SHA1_LOCK_FILE) buf.sha1.lock.tmp --quiet || $(MAKE) -B $(SHA1_LOCK_FILE)
++	@cmp -s $(SHA1_LOCK_FILE) buf.sha1.lock.tmp || $(MAKE) -B $(SHA1_LOCK_FILE)
+ 	@rm -f buf.sha1.lock.tmp
+
+ $(SHA1_LOCK_FILE): $(BUF) protoc-deps
