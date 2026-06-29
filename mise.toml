@@ -10,6 +10,7 @@ redactions = [
 [tools]
 "aqua:hashicorp/hcp" = "latest"
 codex = "latest"
+gh = "latest"
 
 [env]
 _.file = { path = ".env", redact = true }
