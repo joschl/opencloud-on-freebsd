@@ -1,18 +1,18 @@
 # OpenCloud FreeBSD Builder
 
-This repository builds OpenCloud for FreeBSD inside a Vagrant-managed builder VM and packages the reusable FreeBSD builder box.
+Builds OpenCloud for FreeBSD in Vagrant.
 
-## Prerequisites
+## Requirements
 
 - Vagrant
 - VirtualBox
 - mise
-- HashiCorp Cloud Platform auth configured for `hcp auth print-access-token`
-- Vagrant Cloud account with access to publish the configured box
+- HCP auth for `hcp auth print-access-token`
+- Vagrant Cloud account for box publishing
 
-## Local Environment
+## `.env`
 
-Local secrets belong in `.env`, which is intentionally ignored by git. Define only the values you need to override:
+Ignored by git. Supported keys:
 
 ```sh
 HCP_CLIENT_ID=
@@ -31,15 +31,24 @@ FREEBSD_BUILD_DISK_MB=
 VAGRANT_CLOUD_BOX=
 ```
 
-## Common Commands
+## Commands
 
 ```sh
 mise run box:login
 mise run opencloud:build
+mise run opencloud:package
+mise run opencloud:install-smoke
+mise run opencloud:install-vm-test
 mise run box:ready
 mise run box:publish
 mise run box:build-fresh
 mise run patches:update
 ```
 
-`.env`, build outputs, Vagrant state, and generated box files are intentionally ignored.
+## Outputs
+
+- install script: `dist/release/install-opencloud-<version>-freebsd-amd64.sh`
+- checksum: `dist/release/install-opencloud-<version>-freebsd-amd64.sh.sha256`
+- install docs: [docs/freebsd-install.md](docs/freebsd-install.md)
+
+Ignored: `.env`, `.vagrant/`, `build/`, `dist/`, `*.box`, `*.vmdk`, `*.vmdk.xz`.

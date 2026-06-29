@@ -56,6 +56,18 @@ run = "scripts/box-diagnose.sh"
 description = "Build OpenCloud inside the FreeBSD Vagrant VM"
 run = "scripts/opencloud-build.sh"
 
+[tasks."opencloud:package"]
+description = "Package the built FreeBSD OpenCloud artifact for installation"
+run = "scripts/opencloud-package.sh"
+
+[tasks."opencloud:install-smoke"]
+description = "Smoke-test the FreeBSD install bundle inside the builder VM"
+run = "scripts/opencloud-install-smoke.sh"
+
+[tasks."opencloud:install-vm-test"]
+description = "Install the FreeBSD bundle into the builder VM and validate the running service"
+run = "scripts/opencloud-install-vm-test.sh"
+
 [tasks."box:build-fresh"]
 description = "Destroy local VM and build from a freshly booted remote FreeBSD builder box"
 run = "scripts/box-build-fresh.sh"

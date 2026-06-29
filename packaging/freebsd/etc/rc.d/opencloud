@@ -1,0 +1,50 @@
+#!/bin/sh
+
+# PROVIDE: opencloud
+# REQUIRE: LOGIN NETWORKING
+# KEYWORD: shutdown
+
+. /etc/rc.subr
+
+name="opencloud"
+rcvar="opencloud_enable"
+
+load_rc_config "${name}"
+
+: "${opencloud_enable:=NO}"
+: "${opencloud_user:=opencloud}"
+: "${opencloud_env_file:=/usr/local/etc/opencloud/opencloud.env}"
+: "${opencloud_config_dir:=/usr/local/etc/opencloud}"
+: "${opencloud_data_dir:=/var/db/opencloud}"
+: "${opencloud_log:=/var/log/opencloud/opencloud.log}"
+: "${opencloud_pidfile:=/var/run/opencloud/opencloud.pid}"
+: "${opencloud_command:=/usr/local/bin/opencloud}"
+
+pidfile="${opencloud_pidfile}"
+command="/usr/sbin/daemon"
+procname="${opencloud_command}"
+start_precmd="opencloud_precmd"
+start_cmd="opencloud_start"
+
+opencloud_precmd()
+{
+	if [ ! -x "${opencloud_command}" ]; then
+		err 1 "missing executable: ${opencloud_command}"
+	fi
+	if [ ! -f "${opencloud_env_file}" ]; then
+		err 1 "missing environment file: ${opencloud_env_file}"
+	fi
+
+	install -d -o "${opencloud_user}" -g "${opencloud_user}" -m 0750 \
+		"${opencloud_config_dir}" "${opencloud_data_dir}" \
+		"$(dirname "${opencloud_log}")" "$(dirname "${opencloud_pidfile}")"
+}
+
+opencloud_start()
+{
+	${command} -f -p "${opencloud_pidfile}" -o "${opencloud_log}" \
+		-u "${opencloud_user}" /bin/sh -c \
+		"HOME='${opencloud_data_dir}'; export HOME; set -a; . '${opencloud_env_file}'; set +a; '${opencloud_command}' init || true; exec '${opencloud_command}' server"
+}
+
+run_rc_command "$1"
